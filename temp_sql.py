@@ -2,7 +2,10 @@ import time
 import requests
 import selectorlib
 from datetime import datetime
+import sqlite3
 
+#Esatblish a conneciton and a server
+connection = sqlite3.connect("data.db")
 
 #scrap temp from
 URL = "https://programmer100.pythonanywhere.com/"
@@ -22,9 +25,9 @@ def extract(source):
 
 def store(extracted):
     now = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-    with open("data.txt", "a") as file:
-        line = f"{now},{extracted}\n"
-        file.write(line)
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO temp VALUES(?,?)",(now, extracted))
+    connection.commit()
 
 if __name__ == "__main__":
     while True:
@@ -32,7 +35,7 @@ if __name__ == "__main__":
         extracted = extract(scraped)
         print(extracted)
         store(extracted)
-        time.sleep(5)
+        time.sleep(20)
 
 
 #store in a txt file, text file should alwso contain the date
